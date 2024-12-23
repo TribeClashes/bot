@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "tribeclashesbot"
+version = "0.1.0"
+description = ""
+authors = ["Plummy <plummybeatsoff@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+pydantic = "^2.10.4"
+pydantic-settings = "^2.7.0"
+uvicorn = "^0.34.0"
+babel = "^2.16.0"
+redis = "^5.2.1"
+pytest = "^8.3.4"
+aiogram = "^3.16.0"
+aiogram-cli = "^1.1.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
