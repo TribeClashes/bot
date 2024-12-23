@@ -5,6 +5,7 @@ from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 
+from bot.middlewares.logging import LoggingMiddleware
 from config import Config
 
 config: Config = Config(_env_file=".env")
@@ -12,6 +13,9 @@ config: Config = Config(_env_file=".env")
 
 def create_dispatcher() -> Dispatcher:
     new_dispatcher: Dispatcher = Dispatcher()
+
+    new_dispatcher.update.outer_middlewarere.register(LoggingMiddleware("tribeclashes"))
+
     return new_dispatcher
 
 
