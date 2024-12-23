@@ -4,14 +4,30 @@ import logging
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
+from aiogram.fsm.scene import SceneRegistry
 from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.fsm.storage.redis import RedisStorage
 from pydantic import SecretStr
 
+from bot.handlers.start import start_command_router
 from bot.middlewares.logging import LoggingMiddleware
 from config import Config
 
 config: Config = Config(_env_file=".env")
+
+
+def register_middlewares(dispatcher: Dispatcher):
+    dispatcher.update.outer_middleware.register(LoggingMiddleware("tribeclashes"))
+
+
+def include_routers(dispatcher: Dispatcher):
+    dispatcher.include_routers(
+        start_command_router
+    )
+
+
+def register_scenes(dispatcher: Dispatcher):
+    registry: SceneRegistry = SceneRegistry(dispatcher)
 
 
 def create_dispatcher() -> Dispatcher:
@@ -23,7 +39,10 @@ def create_dispatcher() -> Dispatcher:
         storage: RedisStorage = RedisStorage.from_url(redis_dsn.get_secret_value())
 
     new_dispatcher: Dispatcher = Dispatcher(storage=storage)
-    new_dispatcher.update.outer_middlewarere.register(LoggingMiddleware("tribeclashes"))
+
+    register_middlewares(new_dispatcher)
+    include_routers(new_dispatcher)
+    register_scenes(new_dispatcher)
 
     return new_dispatcher
 
