@@ -9,20 +9,29 @@ from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.fsm.storage.redis import RedisStorage
 from pydantic import SecretStr
 
+from bot.handlers.game import game_command_router
 from bot.handlers.start import start_command_router
 from bot.middlewares.logging import LoggingMiddleware
+from bot.middlewares.requests import RequestsMiddleware
 from config import Config
 
 config: Config = Config(_env_file=".env")
 
 
 def register_middlewares(dispatcher: Dispatcher):
+    requests_middleware: RequestsMiddleware = RequestsMiddleware(
+        config.api_url,
+        headers={"X-API-Key": config.api_key.get_secret_value()}
+    )
+
     dispatcher.update.outer_middleware.register(LoggingMiddleware("tribeclashes"))
+    dispatcher.update.outer_middleware.register(requests_middleware)
 
 
 def include_routers(dispatcher: Dispatcher):
     dispatcher.include_routers(
-        start_command_router
+        start_command_router,
+        game_command_router
     )
 
 
@@ -39,6 +48,12 @@ def create_dispatcher() -> Dispatcher:
         storage: RedisStorage = RedisStorage.from_url(redis_dsn.get_secret_value())
 
     new_dispatcher: Dispatcher = Dispatcher(storage=storage)
+
+    new_dispatcher.workflow_data.update(
+        {
+            "config": config
+        }
+    )
 
     register_middlewares(new_dispatcher)
     include_routers(new_dispatcher)

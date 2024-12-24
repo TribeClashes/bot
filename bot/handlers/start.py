@@ -9,10 +9,10 @@ start_command_router: Router = Router(name=__name__)
 
 
 @start_command_router.message(CommandStart(), IsPrivate())
-async def on_private_start_command(message: Message) -> None:
+async def on_private_start(message: Message) -> None:
     await message.reply(f"<b>Hello, {message.from_user.first_name}!</b>")
 
 
 @start_command_router.message(CommandStart(), IsGroup())
-async def on_group_start_command(message: Message) -> None:
+async def on_group_start(message: Message) -> None:
     await message.reply(f"<b>Hello, {message.chat.title}!</b>")
